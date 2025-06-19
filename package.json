@@ -1,0 +1,11 @@
+{
+  "name": "com.tyradman.hierarchyenhancerx",
+  "version": "1.0.0",
+  "displayName": "Hierarchy Enhancer",
+  "description": "A library to improve the hierarchy a bit.",
+  "unity": "2021.3",
+  "author": {
+    "name": "Ty Radman",
+    "url": "https://github.com/TyRadman"
+  }
+}
