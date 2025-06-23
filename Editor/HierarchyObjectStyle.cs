@@ -3,6 +3,7 @@ using UnityEngine;
 [System.Serializable]
 public class HierarchyPrefixStyle
 {
+    public string StyleName;
     public string Prefix;
     public Color Color;
     public Texture2D Icon;

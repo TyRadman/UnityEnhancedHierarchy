@@ -7,6 +7,8 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
     private SerializedProperty _styles;
     private HierarchyObjectsData _data; 
     private string _lastPrefixBeforeEdit = "";
+    private int _editingStyleNameIndex = -1;
+
 
 
     [MenuItem("Tools/Hierarchy Highlighter Manager")]
@@ -70,6 +72,8 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
         for (int i = 0; i < _styles.arraySize; i++)
         {
             SerializedProperty element = _styles.GetArrayElementAtIndex(i);
+
+            SerializedProperty styleName = element.FindPropertyRelative("StyleName");
             SerializedProperty prefix = element.FindPropertyRelative("Prefix");
 
             SerializedProperty color = element.FindPropertyRelative("Color");
@@ -80,7 +84,28 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
 
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField($"Style {i + 1}", EditorStyles.boldLabel);
+
+            // EditorGUILayout.LabelField($"Style {i + 1}", EditorStyles.boldLabel);
+
+            string displayName = !string.IsNullOrEmpty(styleName.stringValue) ? styleName.stringValue : $"Style {i + 1}";
+
+            if (_editingStyleNameIndex == i)
+            {
+                styleName.stringValue = EditorGUILayout.TextField(styleName.stringValue);
+                if (GUILayout.Button("OK", GUILayout.Width(40)))
+                {
+                    _editingStyleNameIndex = -1;
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("Edit", GUILayout.Width(40)))
+                {
+                    _editingStyleNameIndex = i;
+                }
+                EditorGUILayout.LabelField(displayName, EditorStyles.boldLabel);
+            }
+
             if (GUILayout.Button("Remove", GUILayout.Width(60)))
             {
                 _styles.DeleteArrayElementAtIndex(i);
