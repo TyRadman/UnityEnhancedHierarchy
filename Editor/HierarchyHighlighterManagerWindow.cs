@@ -24,33 +24,24 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
     {
         if (_data != null) return;
 
-        // Ensure the static constructor runs so asset gets created
-        System.Type type = typeof(HierarchyHighlighter);
-        System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
+        // Ensure the static constructor runs
+        System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(HierarchyHighlighter).TypeHandle);
 
-        // Look next to HierarchyHighlighter.cs
-        string[] scriptGuids = AssetDatabase.FindAssets("HierarchyHighlighter t:MonoScript");
-        if (scriptGuids.Length == 0)
-        {
-            Debug.LogError("Cannot locate HierarchyHighlighter.cs.");
-            return;
-        }
-
-        string scriptPath = AssetDatabase.GUIDToAssetPath(scriptGuids[0]);
-        string folder = System.IO.Path.GetDirectoryName(scriptPath);
-        string expectedAssetPath = System.IO.Path.Combine(folder, "HierarchyObjectsData.asset").Replace("\\", "/");
-
-        _data = AssetDatabase.LoadAssetAtPath<HierarchyObjectsData>(expectedAssetPath);
+        // Access _data via reflection (or a public getter)
+        _data = typeof(HierarchyHighlighter)
+            .GetField("_data", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
+            ?.GetValue(null) as HierarchyObjectsData;
 
         if (_data == null)
         {
-            Debug.LogError($"HierarchyObjectsData.asset not found at expected path: {expectedAssetPath}");
+            Debug.LogError("[HierarchyHighlighterManagerWindow] Could not find HierarchyObjectsData asset. Make sure it's included in the package.");
             return;
         }
 
         _serializedData = new SerializedObject(_data);
         _styles = _serializedData.FindProperty("Styles");
     }
+
 
     private void OnGUI()
     {
