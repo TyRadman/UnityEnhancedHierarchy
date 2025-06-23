@@ -22,7 +22,10 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
 
     private void LoadData()
     {
-        if (_data != null) return;
+        if (_data != null && _styles != null && _serializedData != null)
+        {
+            return;
+        }
 
         // Ensure the static constructor runs
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(HierarchyHighlighter).TypeHandle);
