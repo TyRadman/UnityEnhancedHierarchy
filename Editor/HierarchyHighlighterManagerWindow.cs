@@ -92,7 +92,7 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
             {
                 styleName.stringValue = EditorGUILayout.TextField(styleName.stringValue);
                 
-                if (GUILayout.Button("Save name", GUILayout.Width(40)))
+                if (GUILayout.Button("Save name", GUILayout.Width(80)))
                 {
                     _editingStyleNameIndex = -1;
                 }
@@ -101,7 +101,7 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
             {
                 EditorGUILayout.LabelField(displayName, EditorStyles.boldLabel);
 
-                if (GUILayout.Button("Edit name", GUILayout.Width(40)))
+                if (GUILayout.Button("Edit name", GUILayout.Width(80)))
                 {
                     _editingStyleNameIndex = i;
                 }
