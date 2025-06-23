@@ -6,7 +6,6 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
     private SerializedObject _serializedData;
     private SerializedProperty _styles;
     private HierarchyObjectsData _data; 
-    private int _lastEditedIndex = -1;
     private string _lastPrefixBeforeEdit = "";
 
 
