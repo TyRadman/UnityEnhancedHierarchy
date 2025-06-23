@@ -92,18 +92,20 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
             if (_editingStyleNameIndex == i)
             {
                 styleName.stringValue = EditorGUILayout.TextField(styleName.stringValue);
-                if (GUILayout.Button("OK", GUILayout.Width(40)))
+                
+                if (GUILayout.Button("Save name", GUILayout.Width(40)))
                 {
                     _editingStyleNameIndex = -1;
                 }
             }
             else
             {
-                if (GUILayout.Button("Edit", GUILayout.Width(40)))
+                EditorGUILayout.LabelField(displayName, EditorStyles.boldLabel);
+
+                if (GUILayout.Button("Edit name", GUILayout.Width(40)))
                 {
                     _editingStyleNameIndex = i;
                 }
-                EditorGUILayout.LabelField(displayName, EditorStyles.boldLabel);
             }
 
             if (GUILayout.Button("Remove", GUILayout.Width(60)))
