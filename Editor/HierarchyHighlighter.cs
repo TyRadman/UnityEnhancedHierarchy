@@ -13,7 +13,7 @@ public static class HierarchyHighlighter
         None = 2
     }
 
-    private static HierarchyObjectsData _data;
+    public static HierarchyObjectsData Data;
 
     static HierarchyHighlighter()
     {
@@ -21,9 +21,9 @@ public static class HierarchyHighlighter
         EditorApplication.hierarchyWindowItemOnGUI += HandleHierarchyWindowItemOnGUI;
     }
 
-    private static void LoadData()
+    public static void LoadData()
     {
-        if (_data != null) return;
+        if (Data != null) return;
 
         string[] guids = AssetDatabase.FindAssets("HierarchyObjectsData t:HierarchyObjectsData");
 
@@ -33,12 +33,12 @@ public static class HierarchyHighlighter
 
             if (path.Contains("Packages/"))
             {
-                _data = AssetDatabase.LoadAssetAtPath<HierarchyObjectsData>(path);
+                Data = AssetDatabase.LoadAssetAtPath<HierarchyObjectsData>(path);
                 return;
             }
         }
 
-        if (_data == null)
+        if (Data == null)
         {
             Debug.LogError("[HierarchyHighlighter] Could not find bundled HierarchyObjectsData.asset. Make sure it's included in the package.");
         }
@@ -47,7 +47,7 @@ public static class HierarchyHighlighter
 
     private static void HandleHierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
     {
-        if (_data == null) return;
+        if (Data == null) return;
 
         GameObject obj = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
         if (obj == null) return;
@@ -58,7 +58,7 @@ public static class HierarchyHighlighter
         if (mode != NameMode.None)
             objectName = objectName.Substring(1);
 
-        foreach (var style in _data.Styles)
+        foreach (var style in Data.Styles)
         {
             if (string.IsNullOrWhiteSpace(style.Prefix) || style.Prefix.Length < 3)
             {

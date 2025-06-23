@@ -7,8 +7,6 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
     private SerializedProperty _styles;
     private HierarchyObjectsData _data; 
     private string _lastPrefixBeforeEdit = "";
-    private int _editingStyleNameIndex = -1;
-
 
 
     [MenuItem("Tools/Hierarchy Highlighter Manager")]
@@ -24,22 +22,25 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
 
     private void LoadData()
     {
-        if (_data != null && _styles != null && _serializedData != null)
-        {
-            return;
-        }
+        if (_data != null) return;
 
         // Ensure the static constructor runs
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(HierarchyHighlighter).TypeHandle);
 
         // Access _data via reflection (or a public getter)
-        _data = typeof(HierarchyHighlighter)
-            .GetField("_data", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-            ?.GetValue(null) as HierarchyObjectsData;
+        //_data = typeof(HierarchyHighlighter)
+        //    .GetField("_data", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
+        //    ?.GetValue(null) as HierarchyObjectsData;
+        _data = HierarchyHighlighter.Data;
+
+        if(_data)
+        {
+            HierarchyHighlighter.LoadData();
+        }
 
         if (_data == null)
         {
-            Debug.LogError("[HierarchyHighlighterManagerWindow] Could not find HierarchyObjectsData asset. Make sure it's included in the package.");
+            Debug.LogError("FATAL: [HierarchyHighlighterManagerWindow] Could not find HierarchyObjectsData asset. Make sure it's included in the package.");
             return;
         }
 
@@ -53,8 +54,7 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
         if (_serializedData == null || _styles == null)
         {
             LoadData();
-        
-            if (_serializedData == null)
+            if(_serializedData == null)
             {
                 Debug.Log("1");
             }
@@ -72,8 +72,6 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
         for (int i = 0; i < _styles.arraySize; i++)
         {
             SerializedProperty element = _styles.GetArrayElementAtIndex(i);
-
-            SerializedProperty styleName = element.FindPropertyRelative("StyleName");
             SerializedProperty prefix = element.FindPropertyRelative("Prefix");
 
             SerializedProperty color = element.FindPropertyRelative("Color");
@@ -84,30 +82,7 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
 
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
-
-            // EditorGUILayout.LabelField($"Style {i + 1}", EditorStyles.boldLabel);
-
-            string displayName = !string.IsNullOrEmpty(styleName.stringValue) ? styleName.stringValue : $"Style {i + 1}";
-
-            if (_editingStyleNameIndex == i)
-            {
-                styleName.stringValue = EditorGUILayout.TextField(styleName.stringValue);
-                
-                if (GUILayout.Button("Save name", GUILayout.Width(40)))
-                {
-                    _editingStyleNameIndex = -1;
-                }
-            }
-            else
-            {
-                EditorGUILayout.LabelField(displayName, EditorStyles.boldLabel);
-
-                if (GUILayout.Button("Edit name", GUILayout.Width(40)))
-                {
-                    _editingStyleNameIndex = i;
-                }
-            }
-
+            EditorGUILayout.LabelField($"Style {i + 1}", EditorStyles.boldLabel);
             if (GUILayout.Button("Remove", GUILayout.Width(60)))
             {
                 _styles.DeleteArrayElementAtIndex(i);
