@@ -47,7 +47,9 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
     {
         if (_serializedData == null || _styles == null)
         {
-            if(_serializedData == null)
+            LoadData();
+        
+            if (_serializedData == null)
             {
                 Debug.Log("1");
             }
