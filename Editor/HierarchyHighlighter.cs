@@ -74,15 +74,14 @@ public static class HierarchyHighlighter
 
                 Color bgColor = style.Color;
 
-                // Adjust alpha based on state
-                if (Selection.activeInstanceID == instanceID)
-                {
-                    bgColor.a = 0f; // fully transparent
-                }
-                else if (bgRect.Contains(Event.current.mousePosition))
-                {
-                    bgColor.a *= 0.5f; // 50% opacity
-                }
+
+                float brightnessBoost = Selection.activeInstanceID == instanceID ? 1.4f :
+                        bgRect.Contains(Event.current.mousePosition) ? 1.15f : 1f;
+
+                bgColor.r = Mathf.Min(bgColor.r * brightnessBoost, 1f);
+                bgColor.g = Mathf.Min(bgColor.g * brightnessBoost, 1f);
+                bgColor.b = Mathf.Min(bgColor.b * brightnessBoost, 1f);
+
 
                 EditorGUI.DrawRect(bgRect, bgColor);
 
