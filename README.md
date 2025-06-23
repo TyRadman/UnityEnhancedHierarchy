@@ -52,5 +52,5 @@ Or use the Unity Package Manager:
 
 ## TODOs:
 - Name field for different styles.
-- Add highlight and selection colors for objects rather than changing the transparency.
-- Fix the issue where compiling code causes the hierarchy manager to fail to load the styles asset.
+- ~~Add highlight and selection colors for objects rather than changing the transparency.~~
+- ~~Fix the issue where compiling code causes the hierarchy manager to fail to load the styles asset~~.
