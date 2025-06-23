@@ -11,7 +11,7 @@ Hierarchy Enhancer X is a lightweight Unity Editor tool that highlights and orga
 - Fully managed via a dedicated editor window  
 - Self-contained as a Unity package — no runtime impact
 
-## 📦 Installation
+## Installation
 
 Add this line to your project's `manifest.json` under `dependencies`:
 
