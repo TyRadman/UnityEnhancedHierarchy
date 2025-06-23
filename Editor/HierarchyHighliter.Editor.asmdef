@@ -1,0 +1,9 @@
+{
+  "name": "HierarchyHighlighter.Editor",
+  "references": [
+    "UnityEditor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}
