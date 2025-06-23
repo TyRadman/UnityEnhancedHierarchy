@@ -25,15 +25,16 @@ public static class HierarchyHighlighter
     {
         if (_data != null) return;
 
-        // Look for the asset specifically in the package (not project-wide)
         string[] guids = AssetDatabase.FindAssets("HierarchyObjectsData t:HierarchyObjectsData");
+
         foreach (string guid in guids)
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
-            if (path.Contains("Packages/com.tyradman.hierarchyenhancerx")) // match your actual package name
+
+            if (path.Contains("Packages/"))
             {
                 _data = AssetDatabase.LoadAssetAtPath<HierarchyObjectsData>(path);
-                break;
+                return;
             }
         }
 
@@ -42,31 +43,6 @@ public static class HierarchyHighlighter
             Debug.LogError("[HierarchyHighlighter] Could not find bundled HierarchyObjectsData.asset. Make sure it's included in the package.");
         }
     }
-
-
-    //private static void LoadData()
-    //{
-    //    if (_data != null) return;
-
-    //    string[] guids = AssetDatabase.FindAssets("t:HierarchyObjectsData");
-    //    if (guids.Length > 0)
-    //    {
-    //        string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-    //        _data = AssetDatabase.LoadAssetAtPath<HierarchyObjectsData>(path);
-    //        return;
-    //    }
-
-    //    // No asset found, create it
-    //    string scriptPath = AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(ScriptableObject.CreateInstance<HierarchyObjectsData>()));
-    //    string directory = System.IO.Path.GetDirectoryName(scriptPath);
-    //    string assetPath = System.IO.Path.Combine(directory, "HierarchyObjectsData.asset").Replace("\\", "/");
-
-    //    _data = ScriptableObject.CreateInstance<HierarchyObjectsData>();
-    //    AssetDatabase.CreateAsset(_data, assetPath);
-    //    AssetDatabase.SaveAssets();
-    //    AssetDatabase.Refresh();
-    //    Debug.Log($"Created new HierarchyObjectsData at: {assetPath}");
-    //}
 
 
     private static void HandleHierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
