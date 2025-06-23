@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using System.Xml.Linq;
+using System.Linq;
 
 [InitializeOnLoad]
 public static class HierarchyHighlighter
@@ -13,74 +13,115 @@ public static class HierarchyHighlighter
         None = 2
     }
 
-    private static readonly Dictionary<string, string> prefixColors = new()
-    {
-        { "---", "#f95738" },
-        { "===", "#ee964b" },
-        { "###", "#F4D35E" },
-        { "___", "#FAF0CA" },
-        { "///", "#0D3B66" },
-    };
+    private static HierarchyObjectsData _data;
 
     static HierarchyHighlighter()
     {
+        LoadData();
         EditorApplication.hierarchyWindowItemOnGUI += HandleHierarchyWindowItemOnGUI;
     }
 
-    private static void HandleHierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
+    private static void LoadData()
     {
-        GameObject selectedObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
-        
-        if (selectedObject == null)
+        if (_data != null) return;
+
+        string[] guids = AssetDatabase.FindAssets("t:HierarchyObjectsData");
+        if (guids.Length > 0)
         {
+            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            _data = AssetDatabase.LoadAssetAtPath<HierarchyObjectsData>(path);
             return;
         }
 
-        foreach (KeyValuePair<string,string> kvp in prefixColors)
-        {
-            string objectName = selectedObject.name;
-            char firstChar = char.ToLower(objectName[0]);
-            NameMode mode = firstChar == 'l' ? NameMode.Left : firstChar == 'r' ? NameMode.Right : NameMode.None;
+        // No asset found, create it
+        string scriptPath = AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(ScriptableObject.CreateInstance<HierarchyObjectsData>()));
+        string directory = System.IO.Path.GetDirectoryName(scriptPath);
+        string assetPath = System.IO.Path.Combine(directory, "HierarchyObjectsData.asset").Replace("\\", "/");
 
-            if(mode != NameMode.None)
-            {
-                objectName = objectName.Substring(1);
-            }
-
-            if (objectName.StartsWith(kvp.Key))
-            {
-                Rect originalRect = selectionRect;
-                selectionRect.x = 0;
-                selectionRect.width = EditorGUIUtility.currentViewWidth;
-                ColorUtility.TryParseHtmlString(kvp.Value, out Color color);
-                EditorGUI.DrawRect(selectionRect, color);
-
-                string name = objectName.Substring(kvp.Key.Length).TrimStart();
-                DrawItemName(mode, originalRect, name);
-                break;
-            }
-        }
+        _data = ScriptableObject.CreateInstance<HierarchyObjectsData>();
+        AssetDatabase.CreateAsset(_data, assetPath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        Debug.Log($"Created new HierarchyObjectsData at: {assetPath}");
     }
 
-    private static void DrawItemName(NameMode mode, Rect rect, string name)
+
+    private static void HandleHierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
     {
-        GUIStyle style = new GUIStyle(EditorStyles.label) { normal = { textColor = Color.white } };
+        if (_data == null) return;
 
-        switch (mode)
+        GameObject obj = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+        if (obj == null) return;
+
+        string objectName = obj.name;
+        char firstChar = char.ToLower(objectName[0]);
+        NameMode mode = firstChar == 'l' ? NameMode.Left : firstChar == 'r' ? NameMode.Right : NameMode.None;
+        if (mode != NameMode.None)
+            objectName = objectName.Substring(1);
+
+        foreach (var style in _data.Styles)
         {
-            case NameMode.Left:
-                rect.x = 0;
-                rect.width = EditorGUIUtility.currentViewWidth;
-                style.alignment = TextAnchor.MiddleLeft;
-                EditorGUI.LabelField(rect, name, style);
-                break;
-            case NameMode.Right:
-                style.alignment = TextAnchor.MiddleRight;
-                break;
-            case NameMode.None:
-                break;
-        }
+            if (string.IsNullOrWhiteSpace(style.Prefix) || style.Prefix.Length < 3)
+            {
+                continue;
+            }
 
-        EditorGUI.LabelField(rect, name, style);
+            if (objectName.StartsWith(style.Prefix))
+            {
+                string labelText = objectName.Substring(style.Prefix.Length).TrimStart();
+
+                // Draw background
+                Rect bgRect = new Rect(0, selectionRect.y, EditorGUIUtility.currentViewWidth, selectionRect.height);
+
+                Color bgColor = style.Color;
+
+                // Adjust alpha based on state
+                if (Selection.activeInstanceID == instanceID)
+                {
+                    bgColor.a = 0f; // fully transparent
+                }
+                else if (bgRect.Contains(Event.current.mousePosition))
+                {
+                    bgColor.a *= 0.5f; // 50% opacity
+                }
+
+                EditorGUI.DrawRect(bgRect, bgColor);
+
+                // Icon
+                const float iconSize = 16f;
+                Rect iconRect = new Rect(bgRect.xMax - iconSize - 4, selectionRect.y, iconSize, iconSize);
+
+                // Text
+                GUIStyle labelStyle = new GUIStyle(EditorStyles.label)
+                {
+                    normal = { textColor = Color.white },
+                    alignment = style.Alignment switch
+                    {
+                        NameMode.Left => TextAnchor.MiddleLeft,
+                        NameMode.Right => TextAnchor.MiddleRight,
+                        _ => TextAnchor.MiddleLeft
+                    },
+                    clipping = TextClipping.Clip
+                };
+
+                float padding = 4f;
+                Rect textRect = new Rect(selectionRect)
+                {
+                    width = iconRect.x - selectionRect.x - padding
+                };
+
+                // GUIContent with tooltip
+                GUIContent labelContent = new GUIContent(labelText, style.TooltipText);
+
+                EditorGUI.LabelField(textRect, labelContent, labelStyle);
+
+                if (style.Icon != null)
+                {
+                    GUI.DrawTexture(iconRect, style.Icon, ScaleMode.ScaleToFit);
+                }
+
+                break;
+            }
+        }
     }
 }
