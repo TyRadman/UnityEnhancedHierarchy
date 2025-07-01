@@ -6,13 +6,6 @@ using System.Linq;
 [InitializeOnLoad]
 public static class HierarchyHighlighter
 {
-    public enum NameMode
-    {
-        Left = 0,
-        Right = 1,
-        None = 2
-    }
-
     public static HierarchyObjectsData Data;
 
     static HierarchyHighlighter()
@@ -23,27 +16,31 @@ public static class HierarchyHighlighter
 
     public static void LoadData()
     {
-        if (Data != null) return;
-
-        string[] guids = AssetDatabase.FindAssets("HierarchyObjectsData t:HierarchyObjectsData");
-
-        foreach (string guid in guids)
+        if (Data != null)
         {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-
-            if (path.Contains("Packages/"))
-            {
-                Data = AssetDatabase.LoadAssetAtPath<HierarchyObjectsData>(path);
-                return;
-            }
+            return;
         }
+
+        Data = EditorGUIUtility.Load("HierarchyObjectsData.asset") as HierarchyObjectsData;
 
         if (Data == null)
         {
-            Debug.LogError("[HierarchyHighlighter] Could not find bundled HierarchyObjectsData.asset. Make sure it's included in the package.");
+            Debug.Log("[HierarchyHighlighter] Creating new HierarchyObjectsData asset...");
+
+            Data = ScriptableObject.CreateInstance<HierarchyObjectsData>();
+            string dirPath = "Assets/Editor Default Resources";
+            string assetPath = $"{dirPath}/HierarchyObjectsData.asset";
+
+            if (!AssetDatabase.IsValidFolder(dirPath))
+            {
+                AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
+            }
+
+            AssetDatabase.CreateAsset(Data, assetPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
     }
-
 
     private static void HandleHierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
     {

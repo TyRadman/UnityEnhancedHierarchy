@@ -7,6 +7,11 @@ public class HierarchyPrefixStyle
     public string Prefix;
     public Color Color;
     public Texture2D Icon;
-    public HierarchyHighlighter.NameMode Alignment;
+    public NameMode Alignment;
     public string TooltipText;
+}
+
+public enum NameMode
+{
+    None = 0, Left = 1, Right = 2
 }
