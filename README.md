@@ -1,6 +1,6 @@
 # Hierarchy Enhancer X
 
-Hierarchy Enhancer X is a lightweight Unity Editor tool that highlights and organizes GameObjects in the Hierarchy window using custom color tags, icons, and alignment based on name prefixes.
+Enhanced Hierarchy is a lightweight Unity Editor tool that highlights and organizes GameObjects in the Hierarchy window using custom color tags, icons, name alignment, and even scene-view icons based on name prefixes added to the name of selected gameObjects.
 
 ## Features
 
@@ -28,7 +28,7 @@ Or use the Unity Package Manager:
    **Tools → Hierarchy Highlighter Manager**
 
 2. Use the window to:
-   - Add new styles
+   - Add new styles  
    - Assign a prefix (e.g. `===`)
    - Choose a color
    - Optionally add an icon and tooltip
