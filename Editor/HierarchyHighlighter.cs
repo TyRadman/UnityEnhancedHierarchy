@@ -21,7 +21,7 @@ public static class HierarchyHighlighter
             return;
         }
         
-        string dirPath = "Assets/Editor Default Resources";
+        string dirPath = "Assets/HierarchyHighlighter/Settings";
         string assetPath = $"{dirPath}/HierarchyObjectsData.asset";
 
         Data = AssetDatabase.LoadAssetAtPath<HierarchyObjectsData>(assetPath);
