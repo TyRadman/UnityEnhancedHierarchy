@@ -10,7 +10,7 @@ public static class HierarchyHighlighter
 
     static HierarchyHighlighter()
     {
-        LoadData();
+        EditorApplication.delayCall += LoadData;
         EditorApplication.hierarchyWindowItemOnGUI += HandleHierarchyWindowItemOnGUI;
     }
 
