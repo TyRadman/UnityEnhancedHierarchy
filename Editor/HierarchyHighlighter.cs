@@ -16,26 +16,30 @@ public static class HierarchyHighlighter
 
     public static void LoadData()
     {
-        if (Data != null)
+        if (Data != null) 
         {
             return;
         }
+        
+        string dirPath = "Assets/Editor Default Resources";
+        string assetPath = $"{dirPath}/HierarchyObjectsData.asset";
 
-        Data = EditorGUIUtility.Load("HierarchyObjectsData.asset") as HierarchyObjectsData;
+        Data = AssetDatabase.LoadAssetAtPath<HierarchyObjectsData>(assetPath);
 
         if (Data == null)
         {
             Debug.Log("[HierarchyHighlighter] Creating new HierarchyObjectsData asset...");
 
-            Data = ScriptableObject.CreateInstance<HierarchyObjectsData>();
-            string dirPath = "Assets/Editor Default Resources";
-            string assetPath = $"{dirPath}/HierarchyObjectsData.asset";
-
             if (!AssetDatabase.IsValidFolder(dirPath))
             {
-                AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
+                if (!AssetDatabase.IsValidFolder("Assets/Editor Default Resources"))
+                {
+                    AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
+                }
             }
 
+            Data = ScriptableObject.CreateInstance<HierarchyObjectsData>();
+            
             AssetDatabase.CreateAsset(Data, assetPath);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
