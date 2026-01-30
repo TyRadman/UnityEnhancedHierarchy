@@ -181,6 +181,7 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
         }
 
         _serializedData.ApplyModifiedProperties();
+        EditorUtility.SetDirty(_data);
     }
 
     private bool IsDuplicatePrefix(string prefixValue, int currentIndex)
