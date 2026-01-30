@@ -16,7 +16,7 @@ Enhanced Hierarchy is a lightweight Unity Editor tool that highlights and organi
 Add this line to your project's `manifest.json` under `dependencies`:
 
 ```json
-"com.tyradman.hierarchyenhancerx": "https://github.com/tyradman/hierarchyenhancerx.git"
+"com.tyradman.hierarchyenhancerx": "https://github.com/TyRadman/UnityEnhancedHierarchy.git"
 ```
 
 Or use the Unity Package Manager:  
