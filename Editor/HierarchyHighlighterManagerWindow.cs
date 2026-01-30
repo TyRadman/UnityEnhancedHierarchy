@@ -44,7 +44,6 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
         _serializedData = new SerializedObject(_data);
     }
 
-
     private void OnGUI()
     {
         if (_serializedData == null)
@@ -62,41 +61,43 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
 
         _serializedData.Update();
 
-        var styles = _data.Styles;
+        SerializedProperty stylesProp = _serializedData.FindProperty("Styles");
 
-        for (int i = 0; i < styles.Count; i++)
+        for (int i = 0; i < stylesProp.arraySize; i++)
         {
-            var style = styles[i];
-
-            if(style == null)
-            {
-                break;
-            }
+            SerializedProperty styleElement = stylesProp.GetArrayElementAtIndex(i);
+            
+            SerializedProperty styleNameProp = styleElement.FindPropertyRelative("StyleName");
+            SerializedProperty prefixProp = styleElement.FindPropertyRelative("Prefix");
+            SerializedProperty colorProp = styleElement.FindPropertyRelative("Color");
+            SerializedProperty iconProp = styleElement.FindPropertyRelative("Icon");
+            SerializedProperty alignmentProp = styleElement.FindPropertyRelative("Alignment");
+            SerializedProperty tooltipProp = styleElement.FindPropertyRelative("TooltipText");
 
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
 
-            bool nameExists = !string.IsNullOrEmpty(style.StyleName);
+            bool nameExists = !string.IsNullOrEmpty(styleNameProp.stringValue);
             string displayName;
 
             if (nameExists)
             {
-                displayName = style.StyleName;
+                displayName = styleNameProp.stringValue;
             }
             else
             {
                 displayName = $"Style {i + 1}";
-                style.StyleName = $"Style {i + 1}";
+                styleNameProp.stringValue = $"Style {i + 1}";
             }
 
             if (_editingStyleNameIndex == i)
             {
-                style.StyleName = EditorGUILayout.TextField(style.StyleName);
+                styleNameProp.stringValue = EditorGUILayout.TextField(styleNameProp.stringValue);
 
                 if (GUILayout.Button("Save name", GUILayout.Width(80)))
                 {
                     _editingStyleNameIndex = -1;
-                    EditorUtility.SetDirty(_data);
+                    _serializedData.ApplyModifiedProperties();
                     AssetDatabase.SaveAssets();
                 }
             }
@@ -115,7 +116,7 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
                 // Just to close the others opened above
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.EndVertical();
-                styles.Remove(style);
+                stylesProp.DeleteArrayElementAtIndex(i);
                 break;
             }
 
@@ -123,12 +124,12 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
 
             EditorGUILayout.BeginVertical();
 
-            bool isDuplicate = IsDuplicatePrefix(style.Prefix, i);
+            bool isDuplicate = IsDuplicatePrefix(prefixProp.stringValue, i);
 
             // Store original if editing starts
             if (GUI.GetNameOfFocusedControl() != $"prefix_{i}")
             {
-                _lastPrefixBeforeEdit = style.Prefix;
+                _lastPrefixBeforeEdit = prefixProp.stringValue;
             }
 
             // Draw prefix with red highlight if duplicated
@@ -140,48 +141,47 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
             {
                 Color prevColor = GUI.color;
                 GUI.color = Color.red;
-                style.Prefix = EditorGUI.TextField(prefixRect, "Prefix", style.Prefix);
+                prefixProp.stringValue = EditorGUI.TextField(prefixRect, "Prefix", prefixProp.stringValue);
                 GUI.color = prevColor;
             }
             else
             {
-                style.Prefix = EditorGUI.TextField(prefixRect, "Prefix", style.Prefix);
+                prefixProp.stringValue = EditorGUI.TextField(prefixRect, "Prefix", prefixProp.stringValue);
             }
 
             if (EditorGUI.EndChangeCheck())
             {
                 // If changed to a duplicate, wait for deselection to revert
-                if (IsDuplicatePrefix(style.Prefix, i))
+                if (IsDuplicatePrefix(prefixProp.stringValue, i))
                 {
                     // Only revert after field loses focus
                     if (GUI.GetNameOfFocusedControl() != $"prefix_{i}")
                     {
-                        style.Prefix = _lastPrefixBeforeEdit;
+                        prefixProp.stringValue = _lastPrefixBeforeEdit;
                     }
                 }
                 else
                 {
-                    _lastPrefixBeforeEdit = style.Prefix;
+                    _lastPrefixBeforeEdit = prefixProp.stringValue;
                 }
             }
 
             EditorGUILayout.EndVertical();
 
-            style.Color = EditorGUILayout.ColorField("Color", style.Color); 
-            style.Icon = (Texture2D)EditorGUILayout.ObjectField("Icon", style.Icon, typeof(Texture2D), false, GUILayout.Height(16));
-            style.Alignment = (NameMode)EditorGUILayout.EnumPopup("Alignment", style.Alignment);
-            style.TooltipText = EditorGUILayout.TextField("Tooltip", style.TooltipText);
+            EditorGUILayout.PropertyField(colorProp, new GUIContent("Color"));
+            EditorGUILayout.PropertyField(iconProp, new GUIContent("Icon"), true, GUILayout.Height(16));
+            EditorGUILayout.PropertyField(alignmentProp, new GUIContent("Alignment"));
+            EditorGUILayout.PropertyField(tooltipProp, new GUIContent("Tooltip"));
 
             EditorGUILayout.EndVertical();
         }
 
         if (GUILayout.Button("Add New Style"))
         {
-            styles.Add(new HierarchyPrefixStyle());
+            stylesProp.InsertArrayElementAtIndex(stylesProp.arraySize);
         }
 
         _serializedData.ApplyModifiedProperties();
-        EditorUtility.SetDirty(_data);
     }
 
     private bool IsDuplicatePrefix(string prefixValue, int currentIndex)
@@ -189,14 +189,14 @@ public class HierarchyHighlighterManagerWindow : EditorWindow
         if (string.IsNullOrWhiteSpace(prefixValue) || prefixValue.Length < 3)
             return false;
 
-        for (int i = 0; i < _data.Styles.Count; i++)
+        SerializedProperty stylesProp = _serializedData.FindProperty("Styles");
+        for (int i = 0; i < stylesProp.arraySize; i++)
         {
             if (i == currentIndex) continue;
-            var otherPrefix = _data.Styles[i].Prefix;
+            var otherPrefix = stylesProp.GetArrayElementAtIndex(i).FindPropertyRelative("Prefix").stringValue;
             if (otherPrefix == prefixValue)
                 return true;
         }
         return false;
     }
-
 }
