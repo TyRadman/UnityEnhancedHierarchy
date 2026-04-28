@@ -1,11 +1,19 @@
 {
-  "name": "com.tyradman.hierarchyenhancerx",
-  "version": "1.1.6",
-  "displayName": "Hierarchy Enhancer",
-  "description": "A library to improve the hierarchy a bit.",
+  "name": "com.hierarchystyler",
+  "version": "1.0.0",
+  "displayName": "Hierarchy Styler",
+  "description": "Customize Unity's Hierarchy window. Define reusable styles (background color, side icon, bold, text color) and apply them to GameObjects via right-click. Per-scene database, automatic cleanup of stale entries, and hover/selection feedback.",
   "unity": "2021.3",
   "author": {
-    "name": "Ty Radman",
-    "url": "https://github.com/TyRadman"
-  }
+    "name": "Your Name",
+    "url": "https://github.com/your-username"
+  },
+  "keywords": [
+    "editor",
+    "hierarchy",
+    "tools",
+    "workflow",
+    "productivity"
+  ],
+  "category": "Editor Extensions"
 }

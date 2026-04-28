@@ -1,56 +1,67 @@
-# Hierarchy Enhancer X
+# Hierarchy Styler
 
-Enhanced Hierarchy is a lightweight Unity Editor tool that highlights and organizes GameObjects in the Hierarchy window using custom color tags, icons, name alignment, and even scene-view icons based on name prefixes added to the name of selected gameObjects.
+Customize Unity's Hierarchy window with reusable visual styles. Apply background colors, side icons, and text formatting to GameObjects to make complex scenes scannable at a glance.
+
+![Editor only](https://img.shields.io/badge/Unity-Editor%20Only-blue)
+![Unity 2021.3+](https://img.shields.io/badge/Unity-2021.3%2B-green)
 
 ## Features
 
-- Custom background colors for GameObjects based on prefixes  
-- Optional icons and tooltips  
-- Alignment control (left or right)  
-- Fade on hover and transparency when selected  
-- Fully managed via a dedicated editor window  
-- Self-contained as a Unity package — no runtime impact
+- **Reusable styles** — define background color, side icon, bold text, and text color once, apply anywhere.
+- **Per-scene database** — each scene's styled entries are stored in a `<SceneName>_HierarchyStyles.asset` next to the scene, so they version-control cleanly and follow the scene if it moves.
+- **Right-click to style** — `Add Style... → Pick Style...` on any hierarchy entry opens a small picker.
+- **Background covers the foldout arrow** so parent entries get the same clean look as leaf entries.
+- **Hover and selection feedback** — styled rows lighten on hover and blend toward Unity's selection blue when selected, while keeping their style identity readable.
+- **Self-healing** — entries pointing at deleted GameObjects or removed styles are pruned automatically (or manually via the manager window).
+- **Editor-only** — zero runtime cost. No MonoBehaviours, no scene bloat.
 
 ## Installation
 
-Add this line to your project's `manifest.json` under `dependencies`:
+### Option 1 — Unity Package Manager (Git URL)
 
-```json
-"com.tyradman.hierarchyenhancerx": "https://github.com/TyRadman/UnityEnhancedHierarchy.git"
-```
+1. Open `Window → Package Manager`.
+2. Click the **+** dropdown → **Add package from git URL...**
+3. Enter:
+   ```
+   https://github.com/<your-username>/<your-repo>.git
+   ```
 
-Or use the Unity Package Manager:  
-**Window → Package Manager → Add package from Git URL**
+### Option 2 — Local package
+
+1. Clone or download this repo.
+2. In Unity, `Window → Package Manager → + → Add package from disk...`
+3. Select the `package.json` at the root of the package.
 
 ## Usage
 
-1. After importing, go to  
-   **Tools → Hierarchy Highlighter Manager**
+### Create a style
 
-2. Use the window to:
-   - Add new styles  
-   - Assign a prefix (e.g. `===`)
-   - Choose a color
-   - Optionally add an icon and tooltip
-   - Choose text alignment (left or right)
+1. `Tools → Hierarchy` opens the **Hierarchy Styler** window.
+2. On the **Styles** tab, click **+ New Style**.
+3. Set a display name, background color, optional side icon, and text options.
 
-3. Rename your GameObjects using the prefix to trigger the style:
-   ```
-   === EnemySpawner
-   /// AudioManager
-   ```
+### Apply a style
 
-## Notes
+1. Right-click a GameObject in the Hierarchy.
+2. `Add Style... → Pick Style...`
+3. Click **Apply** on the style you want.
 
-- Prefixes must be **at least 3 characters** to be valid  
-- Duplicate prefixes are not allowed — the manager will warn you  
-- The highlighting system is **editor-only** and does not affect builds  
-- The style asset is bundled and read-only, keeping user changes scoped to UI only
+You can multi-select GameObjects to apply a style to several at once.
 
----
+### Clear a style
 
+Right-click → `Add Style... → Clear Style`.
 
-## TODOs:
-- ~~Name field for different styles~~.
-- ~~Add highlight and selection colors for objects rather than changing the transparency.~~
-- ~~Fix the issue where compiling code causes the hierarchy manager to fail to load the styles asset~~.
+### Inspect or clean up entries
+
+The **Scene Entries** tab in the manager window lists every styled entry in currently-loaded scenes, with a per-scene **Prune** button to drop entries whose target GameObject was deleted, plus a global **Prune All Open Scenes**.
+
+## How it works
+
+- Styles live in a single library asset created at `Assets/HierarchyStyler/HierarchyStyleLibrary.asset` on first use.
+- Per-scene mappings use `GlobalObjectId` so entries survive instance-id resets, renames, and reparenting.
+- A repaint poll (`EditorApplication.update`) drives hover state while the cursor is over the Hierarchy window — and only while it's there.
+
+## License
+
+MIT — see [LICENSE.md](LICENSE.md).
