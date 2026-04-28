@@ -1,12 +1,12 @@
 {
   "name": "com.hierarchystyler",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "Hierarchy Styler",
-  "description": "Customize Unity's Hierarchy window. Define reusable styles (background color, side icon, bold, text color) and apply them to GameObjects via right-click. Per-scene database, automatic cleanup of stale entries, and hover/selection feedback.",
+  "description": "A better hierarchy awaits thee.",
   "unity": "2021.3",
   "author": {
-    "name": "Your Name",
-    "url": "https://github.com/your-username"
+    "name": "Ty Radman",
+    "url": "https://github.com/tyradman"
   },
   "keywords": [
     "editor",
